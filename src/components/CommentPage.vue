@@ -144,7 +144,6 @@ onMounted(()=>{
             v-model:page-size="base_page_conf.size"
             v-if="base_page_conf.total > 5"
             @currentChange="paginationCurrentChange"
-            small
             style="display: flex;align-items: center;justify-content: center;"
             :total="base_page_conf.total"
             class="pagination"
@@ -178,7 +177,6 @@ onMounted(()=>{
     margin-left: 2%;
 }
 .reply-submit-box{
-    display: flex;
     width: auto;
     height: auto;
 }
@@ -202,7 +200,6 @@ onMounted(()=>{
 .comment-content{
     text-indent: 20px;
     font-size: 16px;
-    width: fit-content;
     color: rgba(255,255,255,0.8);
 }
 .avatar-box{
@@ -222,7 +219,7 @@ onMounted(()=>{
     width: fit-content;
 }
 .comment-lower-wrap{
-    width: fit-content;
+
 }
 .nickname{
     font-size: 18px;

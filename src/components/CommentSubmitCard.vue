@@ -9,7 +9,7 @@ import {useAppStore} from "@/stores/app";
         nickname : '',
         email : '',
         website : '',
-        content: ' ',
+        content: '',
         avatar : 'not-update'
     })
 

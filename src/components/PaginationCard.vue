@@ -181,7 +181,7 @@ function paginationCurrentChange(val : number) {
     box-shadow: rgba(0, 0, 0, 0.9) 4px 4px 12px;
 }
 .dark .pagination-wrap:hover{
-    box-shadow: lightpink 0px 0px 16px;
+    box-shadow: lightpink 0 0 16px;
 }
 .colorful .pagination-wrap{
     background: rgb(121,9,34);

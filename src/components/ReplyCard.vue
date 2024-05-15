@@ -243,7 +243,7 @@ function rootCommentDataInit(){
 .msg{
     font-size: 10px;
     color: darkgrey;
-    width: fit-content;
+
 }
 .msg:hover{
     cursor: pointer;

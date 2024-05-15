@@ -73,10 +73,10 @@ onBeforeUnmount(()=>{
 })
 const adjustWindowSize = (()=>{
     windowStyle.value = `max-width:${window.innerWidth}px;min-height:${window.innerHeight}px`
-    const body = document.getElementById('body')
-    if(body){
-        body.style.maxWidth = `${window.innerWidth}px`
-    }
+  const body = document.getElementById('body')
+  if(body){
+    body.style.maxWidth = `${window.innerWidth}px`
+  }
 })
 
 function backToTop(){

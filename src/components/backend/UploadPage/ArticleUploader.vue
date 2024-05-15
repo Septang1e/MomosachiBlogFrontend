@@ -348,7 +348,7 @@ npm run dev
                     <div class="preview-wrap">
                         <el-input type="textarea" v-model="articleEditData.content" :autosize="{ minRows: 5}"/>
                         <ArticleCard v-if="ifPreview" style="color: skyblue !important;" :content="previewData"/>
-                    </div>
+                    </div>b
                     <el-button style="margin-top: 10px" type="primary" @click="ifPreview = !ifPreview">预览</el-button>
                 </el-form-item>
                 <el-form-item style="align-items: end;justify-content: end;display: flex">

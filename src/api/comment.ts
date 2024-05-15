@@ -38,36 +38,32 @@ export interface CommentDTO{
 }
 export function addComment(comment : UploadCommentInterface){
     return request<{code : number,data : string}>({
-        url : '/api/comment/add',
+        url : '/api/comment/',
         data : comment,
         method : 'post'
     })
 }
 export function getCommentWithArticlePid(pageSize : number, current : number, articlePid : string){
     return request<any>({
-        url : `/api/comment/get?articlePid=${articlePid}&pageSize=${pageSize}&pageNum=${current}`,
+        url : `/api/comment?articlePid=${articlePid}&pageSize=${pageSize}&pageNum=${current}`,
         method : 'get'
     })
 }
 export function getCommentWithArticleId(pageSize : number, current : number, articleId : string, rootParentId : string){
     return request<any>({
-        url : `/api/comment/get?articleId=${articleId}&pageSize=${pageSize}&pageNum=${current}&rootParentId=${rootParentId}`,
+        url : `/api/comment?articleId=${articleId}&pageSize=${pageSize}&pageNum=${current}&rootParentId=${rootParentId}`,
         method : 'get'
     })
 }
 export function updateLikeStatus(commentId : string, operationName : string){
-    if(operationName === 'increase' || operationName === 'decrease'){
-        return request<any>({
-            url : `api/comment/${operationName}/${commentId}`,
-            method : 'post'
-        })
-    }else{
-        console.error("invalidUrl")
-    }
+    return request<any>({
+        url : `/api/comment/like/${commentId}?status=${operationName === 'increase' ? '0' : '1'}`,
+        method : 'post'
+    })
 }
 export function getCommentCount(articleId : string) {
     return request<RequestAPI<number>>({
-        url : `api/comment/count/${articleId}`,
+        url : `/api/comment/count/${articleId}`,
         method : 'get',
     })
 }
