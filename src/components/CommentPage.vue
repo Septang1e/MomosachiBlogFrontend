@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import {onActivated, onMounted, reactive, ref} from "vue";
-import {request} from "@/utils/request";
 import type {CommentDTO} from "@/api/comment";
-import {addComment, getCommentWithArticleId, getCommentWithArticlePid, updateLikeStatus} from "@/api/comment";
-import Nprogress from "nprogress"
-import {addCategory} from "@/api/category";
+import {commentPagination, updateLikeStatus} from "@/api/comment";
 import {format} from "date-fns"
 import ReplyCard from "@/components/ReplyCard.vue";
 import {getUserLikes, updateUserLikes} from "@/utils/local-storage";
-import axios from "axios";
 import CommentSubmitCard from "@/components/CommentSubmitCard.vue";
 import {useAppStore} from "@/stores/app";
 import markdownIt from "@/utils/markdown-it";
@@ -18,12 +14,12 @@ const base_page_conf = reactive({
     current : 1,
     total : 0
 })
+const order = ref("create-time")
 const appStore = useAppStore()
 const rootComments : CommentDTO[] = reactive([])
 
 const props = defineProps({
-    articlePid : String,
-    articleId : String,
+    articlePid : String
 })
 function paginationCurrentChange(current : number){
     base_page_conf.current = current
@@ -33,11 +29,11 @@ function paginationCurrentChange(current : number){
 //用于初始化
 function rootCommentDataInit(){
      console.log(articleId)
-     getCommentWithArticlePid(base_page_conf.size, base_page_conf.current, articlePid.value).then((res)=>{
+     commentPagination(base_page_conf.size, base_page_conf.current, articlePid.value, "-1",order.value).then((res)=>{
          const data = res.data
-         rootComments.length = 0
          base_page_conf.total = data.total
          appStore.setCurrentPage(`${articlePid}-${base_page_conf.current}`)
+         rootComments.length = 0
          for(let i in data.records){
              const base_info:CommentDTO = data.records[i]
 
@@ -47,7 +43,7 @@ function rootCommentDataInit(){
              base_info.is_liked = getUserLikes("comment", base_info.commentId)
              base_info.createTime = format(base_info.createTime, "yyyy-MM-dd hh:mm")
              rootComments.push(base_info)
-             articleId.value = base_info.articleId
+             articleId.value = base_info.articlePid
          }
      })
 }
@@ -68,7 +64,6 @@ const articlePid = ref("")
 onMounted(()=>{
     articlePid.value = <string>props['articlePid']
     appStore.commentCntInit(<string>props['articlePid'])
-    articleId.value = <string>props['articleId']
     rootCommentDataInit()
     appStore.changeReplyToCommentId("root")
 })
@@ -84,9 +79,9 @@ onMounted(()=>{
         </div>
         <div class="reply-submit-box-main" v-if="appStore.replyToCommentId === 'root'">
             <comment-submit-card
-                :root-parent-id="'-1'"
-                father-id="-1"
-                :article-id="articlePid"
+                :to_id="'-1'"
+                root_id = "-1"
+                :article-pid="articlePid"
             />
         </div>
         <div v-if="base_page_conf.total > 0">
@@ -123,15 +118,15 @@ onMounted(()=>{
                     </div>
                     <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                         <comment-submit-card
-                            :root-parent-id="item.commentId"
-                            :father-id=item.commentId
-                            :article-id="item.articleId"
+                            :to_id="item.toId"
+                            :root-id=item.commentId
+                            :article-pid="articlePid"
                         />
                     </div>
                     <div class="reply-box">
                         <reply-card
-                            :article-id="item.articleId"
-                            :root-parent-id="item.commentId"
+                            :article_pid="item.articlePid"
+                            :root_id="item.commentId"
                         />
                     </div>
                 </div>

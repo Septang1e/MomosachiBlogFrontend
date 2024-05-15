@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {CommentDTO} from "@/api/comment";
 import {onActivated, onMounted, reactive, ref, watch} from "vue";
-import {getCommentWithArticleId, updateLikeStatus} from "@/api/comment";
+import {commentPagination, updateLikeStatus} from "@/api/comment";
 import {format} from "date-fns";
 import Nprogress from "nprogress";
 import {getUserLikes, updateUserLikes} from "@/utils/local-storage";
@@ -19,8 +19,8 @@ const page_conf = reactive({
 const appStore = useAppStore()
 
 const props = defineProps({
-    articleId : String,
-    rootParentId : String,
+    article_pid : String,
+    root_id : String,
 })
 
 function paginationCurrentChange(current : number){
@@ -50,7 +50,7 @@ watch(appStore.getCurrentPage, ()=>{
 })
 
 function rootCommentDataInit(){
-    getCommentWithArticleId(page_conf.size, page_conf.current, <string>props['articleId'], <string>props['rootParentId']).then((res)=>{
+    commentPagination(page_conf.size, page_conf.current, <string>props['article_pid'], <string>props['root_id'], "create-time").then((res)=>{
         const data = res.data
         replyComments.length = 0
         page_conf.total = data.total
@@ -111,9 +111,9 @@ function rootCommentDataInit(){
             </div>
             <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                 <comment-submit-card
-                    :root-parent-id="rootParentId"
-                    :father-id="item.commentId"
-                    :article-id="item.articleId"
+                    :root-id="root_id"
+                    :reply_to="item.commentId"
+                    :article-pid="item.articlePid"
                 />
             </div>
         </div>

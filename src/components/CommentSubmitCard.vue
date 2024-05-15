@@ -14,9 +14,9 @@ import {useAppStore} from "@/stores/app";
     })
 
     const props = defineProps({
-        articleId : String,
-        fatherId : String,
-        rootParentId : String
+        article_pid : String,
+        to_id : String,
+        root_id : String
     })
 function validateEmail(email: string): boolean {
     const pattern: RegExp = /(^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$)/
@@ -32,12 +32,12 @@ function validateEmail(email: string): boolean {
             ElMessage.error("邮箱不能为空哦")
             return
         }
+        if(validateEmail(email.value)) {
+          ElMessage.error("邮箱格式不正确")
+          return
+        }
         if(commentData.content.trim() === ''){
             ElMessage.error("内容不能为空哦")
-            return
-        }
-        if(validateEmail(email.value)) {
-            ElMessage.error("邮箱格式不正确")
             return
         }
         commentData.content = commentData.content.trim()
@@ -50,11 +50,10 @@ function validateEmail(email: string): boolean {
             content : commentData.content,
             website : commentData.website,
             ipAddress : useAppStore().getIpAddressLocation(),
-            pid : <string>props['articleId'],
+            articlePid : <string>props['article_pid'],
             avatar : commentData.avatar,
-            articleId : "-1",
-            fatherId : <string>props["fatherId"],
-            rootParentId : <string>props["rootParentId"],
+            toId : <string>props["to_id"],
+            rootId : <string>props["root_id"],
             avatarRandom : `src/assets/avatar/momosachi_blog_basic_avatar_${getRandomInt(1, 2)}.png`
         })
         addComment(commentDTO).then((res)=>{

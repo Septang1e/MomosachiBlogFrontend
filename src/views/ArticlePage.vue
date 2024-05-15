@@ -36,7 +36,6 @@ const is_liked = ref(false)
 const msgType = "article"
 
 const article : ArticleDTO = reactive({
-    articleId : '',
     title : "",
     content : "",
     tags : [],

@@ -1,6 +1,7 @@
 import {request} from "@/utils/request";
 import axios from "axios";
 import type {RequestAPI} from "@/api/RequestAPI";
+import type {Page} from "@/api/article";
 
 export interface UploadCommentInterface{
     nickname : string
@@ -8,18 +9,19 @@ export interface UploadCommentInterface{
     website : string,
     avatar : string,
     content : string,
-    articleId : string,
-    fatherId : string,
-    pid : string,
-    rootParentId : string,
+    articlePid : string,
+    toId : string,
+    rootId : string,
     ipAddress : string,
     avatarRandom : string,
 }
 
 export interface CommentDTO{
-    fatherId : string,
-    rootParentId : string,
-    articleId : string,
+    toId : string,
+    rootId : string,
+    articlePid : string,
+    commentId : string
+    toName: string
     content : string,
     nickname : string,
     feature : string
@@ -27,15 +29,15 @@ export interface CommentDTO{
     website : string,
     avatar : string,
     createTime : string
-    commentId : string
     floor : string
-    replyToFeature : string
-    replyTo : string
     ipAddress : string
     likeCount : number
     is_liked : boolean
     canModify : boolean
 }
+
+export type CommentPage = Page<CommentDTO>
+
 export function addComment(comment : UploadCommentInterface){
     return request<{code : number,data : string}>({
         url : '/api/comment/',
@@ -43,15 +45,12 @@ export function addComment(comment : UploadCommentInterface){
         method : 'post'
     })
 }
-export function getCommentWithArticlePid(pageSize : number, current : number, articlePid : string){
-    return request<any>({
-        url : `/api/comment?articlePid=${articlePid}&pageSize=${pageSize}&pageNum=${current}`,
-        method : 'get'
-    })
-}
-export function getCommentWithArticleId(pageSize : number, current : number, articleId : string, rootParentId : string){
-    return request<any>({
-        url : `/api/comment?articleId=${articleId}&pageSize=${pageSize}&pageNum=${current}&rootParentId=${rootParentId}`,
+
+export function commentPagination(size : number, current : number,
+                                  articlePid : string, rootId : string, sort: string
+){
+    return request<RequestAPI<CommentPage>>({
+        url : `/api/comment/pagination/${current}/${size}?articlePid=${articlePid}&rootId=${rootId}&sort=${sort}`,
         method : 'get'
     })
 }
