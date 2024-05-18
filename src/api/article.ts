@@ -22,6 +22,7 @@ export interface ArticleDTO {
     likeCount: number
 }
 export interface ArticleFormData {
+    id: string
     title: string,
     content: string,
     tags: Tag[],

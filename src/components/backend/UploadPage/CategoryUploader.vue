@@ -2,16 +2,14 @@
 
 import {CirclePlus, Delete} from "@element-plus/icons-vue";
 import {onMounted, reactive, ref} from "vue";
-import type {CategoryQueryDTO, Tag, TagQueryDTO} from "@/api";
+import type {ArticleFormData, CategoryQueryDTO, Tag, TagQueryDTO} from "@/api";
 import {
     addCategory,
     deleteCategory,
-    queryTagPagination,
-    tagStatusHandler,
     updateCategory,
     autocompleteOnQueryCategory, queryCategoryPagination, categoryStatusHandler
 } from "@/api";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 import {pidGenerator} from "@/api/generator";
 const loading = ref(false)
 const categoryData : Tag[] = reactive([])
@@ -34,6 +32,34 @@ function paginationCurrentChange(current : number) {
     page_conf.current = current
     queryCategories()
 }
+
+//section utils
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<CategoryQueryDTO[]>([])
+const multipleSelectionId = ref<string[]>([])
+const toggleSelection = (rows?: CategoryQueryDTO[]) => {
+    if (rows) {
+        rows.forEach((row) => {
+            // TODO: improvement typing when refactor table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            multipleTableRef.value!.toggleRowSelection(row, undefined)
+        })
+    } else {
+        multipleTableRef.value!.clearSelection()
+    }
+}
+const handleSelectionChange = (val: CategoryQueryDTO[]) => {
+    multipleSelection.value = val
+    multipleSelectionId.value.length = 0
+    for(let i in val) {
+        multipleSelectionId.value.push(val[i].id)
+    }
+}
+
+//end
+
 function queryCategories() {
     loading.value = true
     queryCategoryPagination(page_conf.current, page_conf.size, keyword.value === "" ? undefined : keyword.value)
@@ -169,9 +195,11 @@ onMounted(()=>{
             >
                 <div class="toolbar-wrapper">
                     <el-button type="primary" @click="handleAdd" :icon="CirclePlus">添加标签</el-button>
-                    <el-button type="danger" :icon="Delete">批量删除</el-button>
+                    <el-button type="danger" :icon="Delete" @click="handleDelete(multipleSelectionId)">批量删除</el-button>
                 </div>
                 <el-table
+                    @selectionChange="handleSelectionChange"
+                    ref="multipleTableRef"
                     :data="categoryData"
                     style="font-weight: bold; overflow-x: hidden; margin-top: 20px">
                     <el-table-column type="selection" width="50" align="center"/>

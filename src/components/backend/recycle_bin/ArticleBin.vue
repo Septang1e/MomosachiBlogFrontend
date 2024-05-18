@@ -9,7 +9,7 @@ import {
 } from "@/api";
 import type {ArticleFormData} from "@/api"
 import {CirclePlus, Delete} from "@element-plus/icons-vue";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 
 const keyword = ref<string>("")
 const articleData : ArticleFormData[] = reactive([])
@@ -19,6 +19,33 @@ const page_conf = {
     size: 10,
     total: 0
 }
+
+//section utils
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<ArticleFormData[]>([])
+const multipleSelectionId = ref<string[]>([])
+const toggleSelection = (rows?: ArticleFormData[]) => {
+    if (rows) {
+        rows.forEach((row) => {
+            // TODO: improvement typing when refactor table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            multipleTableRef.value!.toggleRowSelection(row, undefined)
+        })
+    } else {
+        multipleTableRef.value!.clearSelection()
+    }
+}
+const handleSelectionChange = (val: ArticleFormData[]) => {
+    multipleSelection.value = val
+    multipleSelectionId.value.length = 0
+    for(let i in val) {
+        multipleSelectionId.value.push(val[i].id)
+    }
+}
+
+//end
 
 function queryArticle() {
     loading.value = true
@@ -110,12 +137,14 @@ onMounted(()=>{
         <el-card
             style="margin-top: 20px">
             <div class="toolbar-wrapper">
-                <el-button type="primary" :icon="CirclePlus">批量恢复</el-button>
-                <el-button type="danger" :icon="Delete">批量删除</el-button>
+                <el-button type="primary" :icon="CirclePlus" @click="handleRecover(multipleSelectionId)">批量恢复</el-button>
+                <el-button type="danger" :icon="Delete" @click="handleDelete(multipleSelectionId)">批量删除</el-button>
             </div>
             <el-table
                 style="margin-top: 20px;font-weight: bold;overflow-x: hidden"
                 :data="articleData"
+                ref="multipleTableRef"
+                @selectionChange="handleSelectionChange"
             >
                 <el-table-column type="selection"/>
                 <el-table-column label="id" prop="id" align="center"/>

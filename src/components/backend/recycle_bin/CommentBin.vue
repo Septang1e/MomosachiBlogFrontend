@@ -12,7 +12,7 @@ import {
     tagStatusHandler,
     updateTag, recoverComment, removeCommentFromDatabase
 } from "@/api";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 import {pidGenerator} from "@/api/generator";
 const loading = ref(false)
 const msg = ref<undefined | string>(undefined)
@@ -25,6 +25,34 @@ const page_conf = reactive({
 })
 const commentInfo: CommentQueryDTO[] = reactive([])
 const content = ref("")
+
+//section utils
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<CommentQueryDTO[]>([])
+const multipleSelectionId = ref<string[]>([])
+const toggleSelection = (rows?: CommentQueryDTO[]) => {
+    if (rows) {
+        rows.forEach((row) => {
+            // TODO: improvement typing when refactor table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            multipleTableRef.value!.toggleRowSelection(row, undefined)
+        })
+    } else {
+        multipleTableRef.value!.clearSelection()
+    }
+}
+const handleSelectionChange = (val: CommentQueryDTO[]) => {
+    multipleSelection.value = val
+    multipleSelectionId.value.length = 0
+    for(let i in val) {
+        multipleSelectionId.value.push(val[i].commentId)
+    }
+}
+
+//end
+
 
 function paginationCurrentChange(current : number) {
     page_conf.current = current
@@ -111,11 +139,13 @@ onMounted(()=>{
                 v-loading="loading"
             >
                 <div class="toolbar-wrapper">
-                    <el-button type="primary" :icon="Delete">批量通过</el-button>
-                    <el-button type="danger" :icon="Delete">批量删除</el-button>
+                    <el-button type="primary" :icon="Delete" @click="handleRecover(multipleSelectionId)">批量通过</el-button>
+                    <el-button type="danger" :icon="Delete" @click="handleDelete(multipleSelectionId)">批量删除</el-button>
                 </div>
                 <el-table
                     :data="commentInfo"
+                    ref="multipleTableRef"
+                    
                     style="font-weight: bold; overflow-x: hidden; margin-top: 20px">
                     <el-table-column type="selection" maxwidth="50" align="center"/>
                     <el-table-column :align="'center'" prop="user.nickname" fixed label="nickname"/>

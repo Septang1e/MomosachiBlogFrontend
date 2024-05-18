@@ -4,7 +4,7 @@ import {CirclePlus, Delete} from "@element-plus/icons-vue";
 import {onMounted, reactive, ref} from "vue";
 import type {Tag, TagQueryDTO} from "@/api";
 import {addTad, deleteTag, queryTagPagination, tagStatusHandler, updateTag} from "@/api";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 import {autocompleteOnQueryTag, autocompleteOnSearch} from "@/api/elasticsearch";
 import {pidGenerator} from "@/api/generator";
 const loading = ref(false)
@@ -28,6 +28,34 @@ function paginationCurrentChange(current : number) {
     page_conf.current = current
     queryTags()
 }
+
+//section utils
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<TagQueryDTO[]>([])
+const multipleSelectionId = ref<string[]>([])
+const toggleSelection = (rows?: TagQueryDTO[]) => {
+    if (rows) {
+        rows.forEach((row) => {
+            // TODO: improvement typing when refactor table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            multipleTableRef.value!.toggleRowSelection(row, undefined)
+        })
+    } else {
+        multipleTableRef.value!.clearSelection()
+    }
+}
+const handleSelectionChange = (val: TagQueryDTO[]) => {
+    multipleSelection.value = val
+    multipleSelectionId.value.length = 0
+    for(let i in val) {
+        multipleSelectionId.value.push(val[i].id)
+    }
+}
+
+//end
+
 function queryTags() {
     loading.value = true
     queryTagPagination(page_conf.current, page_conf.size, keyword.value === "" ? undefined : keyword.value)
@@ -164,9 +192,11 @@ onMounted(()=>{
             >
                 <div class="toolbar-wrapper">
                     <el-button type="primary" @click="handleAdd" :icon="CirclePlus">添加标签</el-button>
-                    <el-button type="danger" :icon="Delete">批量删除</el-button>
+                    <el-button type="danger" :icon="Delete" @click="handleDelete(multipleSelectionId)">批量删除</el-button>
                 </div>
                 <el-table
+                    ref="multipleTableRef"
+                    @selectionChange="handleSelectionChange"
                     :data="tagData"
                     style="font-weight: bold; overflow-x: hidden; margin-top: 20px">
                     <el-table-column type="selection" width="50" align="center"/>

@@ -8,7 +8,7 @@ import {
     deleteArticle,
     saveArticle, updateArticle
 } from "@/api/article";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 import markdownIt from "@/utils/markdown-it";
 import ArticleCard from "@/components/ArticleCard.vue";
 import {CirclePlus, Delete} from "@element-plus/icons-vue";
@@ -29,6 +29,35 @@ let duplicateTagChecker = new Set<String>
 //dialog
 const dialogVisible = ref(false)
 
+//section utils
+
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleSelection = ref<ArticleFormData[]>([])
+const multipleSelectionId = ref<string[]>([])
+const toggleSelection = (rows?: ArticleFormData[]) => {
+    if (rows) {
+        rows.forEach((row) => {
+            // TODO: improvement typing when refactor table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            multipleTableRef.value!.toggleRowSelection(row, undefined)
+        })
+    } else {
+        multipleTableRef.value!.clearSelection()
+    }
+}
+const handleSelectionChange = (val: ArticleFormData[]) => {
+    multipleSelection.value = val
+    multipleSelectionId.value.length = 0
+    for(let i in val) {
+        multipleSelectionId.value.push(val[i].id)
+    }
+    console.log(multipleSelectionId)
+}
+
+//end
+
+
 const articleRow = ref<undefined | number>()
 const articleFormData: ArticleFormData = reactive({
     title: '',
@@ -41,6 +70,7 @@ const articleFormData: ArticleFormData = reactive({
     category: '',
     categoryPid: '',
     description: '',
+    id: '',
 })
 const articleEditData : ArticleFormData = reactive(Object.assign({}, articleFormData))
 const previewData = ref("")
@@ -256,10 +286,12 @@ const modelTest = ref(true)
             >
                 <div class="toolbar-wrapper">
                     <el-button type="primary" @click="handleArticleAdd" :icon="CirclePlus" size="default">添加文章</el-button>
-                    <el-button type="danger" :icon="Delete">批量删除</el-button>
+                    <el-button type="danger" :icon="Delete" @click="handleDelete(multipleSelectionId)">批量删除</el-button>
                 </div>
                 <el-table
                     style="font-weight: bold;border-radius: 8px;"
+                    ref="multipleTableRef"
+                    @selectionChange="handleSelectionChange"
                     :data="articleInfo">
                     <el-table-column type="selection" width="50" align="center" />
                     <el-table-column fixed prop="id" label="Id" max-width="150" align="center"/>
@@ -292,8 +324,15 @@ const modelTest = ref(true)
                         </template>
                     </el-table-column>
                 </el-table>
-npm run dev
-
+                <el-pagination
+                    layout="total, prev, pager, next, jumper"
+                    v-model:current-page="page_conf.current"
+                    v-model:page-size="page_conf.size"
+                    :total="page_conf.total"
+                    style="align-items: center; justify-content: center; margin-top: 10px;"
+                    @currentChange="paginationCurrentChange"
+                    :background="true"
+                />
             </el-card>
         </div>
         <el-dialog
