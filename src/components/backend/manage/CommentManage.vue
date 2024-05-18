@@ -7,7 +7,7 @@ import {
     acceptComment, deleteComment,
     queryCommentExaminePage,
 } from "@/api";
-import {ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox, ElTable} from "element-plus";
 const loading = ref(false)
 const msg = ref<undefined | string>(undefined)
 const dialogVisible = ref(false)
