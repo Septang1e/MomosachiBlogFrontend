@@ -11,7 +11,7 @@ const props = defineProps({
     content : String
 })
 function adjustWindowSize() {
-    windowStyle.value = `max-width: ${window.innerWidth - 40}px`
+
 }
 
 onMounted(()=>{
@@ -48,7 +48,6 @@ pre:before {
 .article-card-container{
     font-size: 1rem;
     font-weight: bold;
-    width: 100%;
     &::-webkit-scrollbar {
         /*滚动条整体样式*/
         width: 5px;
@@ -80,7 +79,7 @@ pre:before {
     }
     p{
         img{
-            width: 100%;
+            width: calc(100% - 48px);
             transition: all ease-in-out 0.8s;
         }
         img:hover{

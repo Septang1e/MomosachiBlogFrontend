@@ -39,12 +39,20 @@ export const useAppStore = defineStore("app",()=>{
     })
     const toc = ref(handleSideBarStatus(Configuration.sideBarStatus))//用于处理toc
 
-    const commentCardKey = ref(0)
-    function commentHandleUpdate() {
-        commentCardKey.value++
+    const rootKey = ref(0)
+    const childKey = ref(0)
+    function rootCommentUpdateHandler() {
+        rootKey.value++
     }
-    function getCommentCardKey(){
-        return commentCardKey.value
+    function childCommentUpdateHandler() {
+        childKey.value++
+    }
+
+    function getCommentChildKey() {
+        return childKey.value
+    }
+    function getCommentRootKey(){
+        return rootKey.value
     }
     function tocHandler() {
         toc.value = handleSideBarStatus(Configuration.sideBarStatus)
@@ -114,7 +122,7 @@ export const useAppStore = defineStore("app",()=>{
         commentCntInit, commentCntDecrease,
         setIpAddressLocation, getIpAddressLocation,
         getCurrentPage, setCurrentPage,
-        getCommentCardKey, commentHandleUpdate,
+        getCommentRootKey, getCommentChildKey, childCommentUpdateHandler, rootCommentUpdateHandler,
         tocHandler, getTocStatus
     }
 })

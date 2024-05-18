@@ -3,12 +3,10 @@ import Home from "@/views/Home.vue";
 import ArticlePage from "@/views/ArticlePage.vue";
 import PaginationCard from "@/components/PaginationCard.vue";
 import CategoryPage from "@/components/CategoryPage.vue";
-import TagsCard from "@/components/TagsCard.vue";
 import TagsPage from "@/components/TagsPage.vue";
 import BackendPage from "@/views/backend/BackendPage.vue";
 import LoginPage from "@/components/backend/LoginPage.vue";
 import BackendDashboard from "@/components/backend/BackendDashboard.vue";
-import AdminIndex from "@/components/backend/format/FormatPage.vue";
 import ArticleUploader from "@/components/backend/UploadPage/ArticleUploader.vue";
 import ToolsPage from "@/views/ToolsPage.vue";
 import ToolsNavCard from "@/components/tools/tools-nav-card.vue";
@@ -18,6 +16,8 @@ import CategoryUploader from "@/components/backend/UploadPage/CategoryUploader.v
 import ArticleBin from "@/components/backend/recycle_bin/ArticleBin.vue";
 import CategoryBin from "@/components/backend/recycle_bin/CategoryBin.vue";
 import TagBin from "@/components/backend/recycle_bin/TagBin.vue";
+import CommentManage from "@/components/backend/manage/CommentManage.vue";
+import CommentBin from "@/components/backend/recycle_bin/CommentBin.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -113,6 +113,11 @@ const router = createRouter({
                           component: CategoryUploader
                       },
                       {
+                          path: '/admin-backend/comment',
+                          name: '评论',
+                          component: CommentManage
+                      },
+                      {
                           path: '/admin-backend/bin/article',
                           name: 'bin_article',
                           component: ArticleBin
@@ -126,6 +131,11 @@ const router = createRouter({
                           path: '/admin-backend/bin/tag',
                           name: 'bin_tag',
                           component: TagBin
+                      },
+                      {
+                          path: '/admin-backend/bin/comment',
+                          name: 'bin_comment',
+                          component: CommentBin
                       }
                   ]
               }

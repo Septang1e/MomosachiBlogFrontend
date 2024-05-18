@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import {RouterLink, RouterView, useRoute, useRouter} from 'vue-router'
+import {RouterView, useRoute, useRouter} from 'vue-router'
 import {onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import Header from "@/components/Header.vue";
-import NProgress from "nprogress";
 import {useAppStore} from "@/stores/app";
-import {request} from "@/utils/request";
 import {useAnimationStore} from "@/stores/animation";
 import {useUserStore} from "@/stores/user";
 import {getAdminCountInfo, logout} from "@/api/user";
@@ -79,15 +76,12 @@ const adjustWindowSize = (()=>{
   }
 })
 
-function backToTop(){
+function backToTop() {
     scrollTo({
         top: 0,
-        behavior:'smooth',
+        behavior: 'smooth',
     })
 }
-const transitionName = ref("")
-const router = useRouter()
-const animationStore = useAnimationStore()
 
 
 </script>

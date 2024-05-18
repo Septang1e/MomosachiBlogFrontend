@@ -6,6 +6,14 @@ export interface User {
     username: string,
     password: string
 }
+
+export interface UserQueryDTO{
+    userId: string
+    nickname: string
+    isAdmin: number
+    email: string
+    emailStatus: string
+}
 export interface AdminCountInfo {
     article_count : number,
     category_count : number,

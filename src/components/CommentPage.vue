@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onActivated, onMounted, reactive, ref} from "vue";
+import {onActivated, onMounted, reactive, ref, watch} from "vue";
 import type {CommentDTO} from "@/api/comment";
 import {commentPagination, updateLikeStatus} from "@/api/comment";
 import {format} from "date-fns"
@@ -25,6 +25,10 @@ function paginationCurrentChange(current : number){
     base_page_conf.current = current
     rootCommentDataInit()
 }
+
+watch(appStore.getCommentRootKey, ()=>{
+    rootCommentDataInit()
+})
 
 //用于初始化
 function rootCommentDataInit(){
@@ -118,14 +122,14 @@ onMounted(()=>{
                     </div>
                     <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                         <comment-submit-card
-                            :to_id="item.toId"
+                            :to_id="item.commentId"
                             :root-id=item.commentId
                             :article-pid="articlePid"
                         />
                     </div>
                     <div class="reply-box">
                         <reply-card
-                            :article_pid="item.articlePid"
+                            :article_pid="props['articlePid']"
                             :root_id="item.commentId"
                         />
                     </div>
@@ -276,7 +280,7 @@ onMounted(()=>{
 }
 .comment-card{
     border-radius: 12px;
-    transition: all ease-in-out 0.7s;
+    transition: height ease-in-out 0.7s,backdrop-filter ease-in-out 0.7s;
     padding: 0 20px 20px 20px;
     margin: 24px;
     width: calc(100% - 48px);

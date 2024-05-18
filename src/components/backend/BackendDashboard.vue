@@ -88,6 +88,13 @@ watch(()=>backendStore.getCollapseStatus(), ()=>{
                 >
                     <span>分类</span>
                 </el-menu-item>
+                <el-menu-item
+                    index="4-4" route="/admin-backend/comment"
+                    class="menu-item"
+                    :class="route.name === '评论' ? 'menu-is-active' : '' "
+                >
+                    <span>评论</span>
+                </el-menu-item>
                 <el-sub-menu
                     index="1">
                     <template #title>
@@ -115,6 +122,13 @@ watch(()=>backendStore.getCollapseStatus(), ()=>{
                             :class="route.name === 'bin_category' ? 'menu-is-active' : '' "
                             index="1-3">
                             <span>分类</span>
+                        </el-menu-item>
+                        <el-menu-item
+                            route="/admin-backend/bin/comment"
+                            class="sub-menu-item"
+                            :class="route.name === 'bin_comment' ? 'menu-is-active' : '' "
+                            index="1-4">
+                            <span>评论</span>
                         </el-menu-item>
                     </el-menu-item-group>
                 </el-sub-menu>

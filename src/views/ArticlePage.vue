@@ -31,7 +31,7 @@ const tocStore = useTocStore()
 const loading = ref(true)
 
 const route = useRoute()
-const PID = route.params["id"]
+const PID = <string>route.params["id"]
 const is_liked = ref(false)
 const msgType = "article"
 
@@ -226,7 +226,6 @@ function likeArticle() {
                 </div>
                 <CommentCard
                     :article-pid="<string>PID"
-                    :key="appStore.getCommentCardKey()"
                 />
             </div>
         </div>

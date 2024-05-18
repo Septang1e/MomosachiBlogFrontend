@@ -46,8 +46,13 @@ onMounted(()=>{
 })
 watch(appStore.getCurrentPage, ()=>{
     page_conf.expand = false
+    page_conf.current = 1
     rootCommentDataInit()
 })
+watch(appStore.getCommentChildKey, ()=>{
+    rootCommentDataInit()
+})
+
 
 function rootCommentDataInit(){
     commentPagination(page_conf.size, page_conf.current, <string>props['article_pid'], <string>props['root_id'], "create-time").then((res)=>{
@@ -111,8 +116,8 @@ function rootCommentDataInit(){
             </div>
             <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                 <comment-submit-card
-                    :root-id="root_id"
-                    :reply_to="item.commentId"
+                    :root-id="props['root_id']"
+                    :to_id="item.commentId"
                     :article-pid="item.articlePid"
                 />
             </div>
@@ -121,7 +126,7 @@ function rootCommentDataInit(){
             layout="total, prev, pager, next,jumper"
             v-model:current-page="page_conf.current"
             v-model:page-size="page_conf.size"
-            v-if="page_conf.total > 5 && page_conf.expand"
+            v-if="page_conf.total > 5 && (page_conf.expand)"
             @currentChange="paginationCurrentChange"
             style="display: flex;flex-wrap: wrap;justify-content: center;overflow-wrap: normal;"
             :total="page_conf.total"

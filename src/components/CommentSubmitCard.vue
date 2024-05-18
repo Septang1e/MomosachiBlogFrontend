@@ -13,11 +13,13 @@ import {useAppStore} from "@/stores/app";
         avatar : 'not-update'
     })
 
-    const props = defineProps({
-        article_pid : String,
-        to_id : String,
-        root_id : String
-    })
+const appStore = useAppStore()
+
+const props = defineProps({
+    article_pid : String,
+    to_id : String,
+    root_id : String
+})
 function validateEmail(email: string): boolean {
     const pattern: RegExp = /(^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$)/
     return !pattern.test(email)
@@ -56,13 +58,18 @@ function validateEmail(email: string): boolean {
             rootId : <string>props["root_id"],
             avatarRandom : `src/assets/avatar/momosachi_blog_basic_avatar_${getRandomInt(1, 2)}.png`
         })
+        console.log(commentDTO)
         addComment(commentDTO).then((res)=>{
             if(res.code == 1) {
                 ElMessage.success("发送成功")
+                if(commentDTO.rootId === '-1' && commentDTO.toId === '-1') {
+                    appStore.rootCommentUpdateHandler()
+                }else{
+                    appStore.childCommentUpdateHandler()
+                }
             }else{
                 ElMessage.error("发送失败")
             }
-            useAppStore().commentHandleUpdate()
         })
     }
 </script>
