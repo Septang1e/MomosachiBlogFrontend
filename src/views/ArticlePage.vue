@@ -54,7 +54,7 @@ const article : ArticleDTO = reactive({
     likeCount: 0,
 })
 
-
+defineEmits(["refreshRelationList"])
 onMounted(()=>{
 
     getArticleInfo()

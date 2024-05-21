@@ -53,3 +53,9 @@ export function getAdminCountInfo() {
         method: 'get'
     })
 }
+export function emailVerify(email : string, userId: string) {
+    return request<RequestAPI<String>>({
+        url: `/api/admin/verify/email?email=${email}&userId=${userId}`,
+        method: 'post'
+    })
+}

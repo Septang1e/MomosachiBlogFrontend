@@ -8,6 +8,7 @@ import {
     queryCommentExaminePage,
 } from "@/api";
 import {ElMessage, ElMessageBox, ElTable} from "element-plus";
+import {emailVerify} from "@/api/user";
 const loading = ref(false)
 const msg = ref<undefined | string>(undefined)
 const dialogVisible = ref(false)
@@ -23,6 +24,7 @@ const page_conf = reactive({
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 const multipleSelection = ref<CommentQueryDTO[]>([])
 const multipleSelectionId = ref<string[]>([])
+const is_judging = ref(new Set<String>)
 const toggleSelection = (rows?: CommentQueryDTO[]) => {
     if (rows) {
         rows.forEach((row) => {
@@ -83,6 +85,19 @@ function handleFilter() {
     status.value = status.value === undefined ? 1 : undefined
     afterOperate()
 }
+function rejudge(row : CommentQueryDTO) {
+    console.log(row)
+    is_judging.value.add(row.commentId)
+    emailVerify(row.user.email, row.user.userId).then((res)=>{
+        ElMessage.success(<string>res.data)
+    }).finally(()=>{
+        setTimeout(()=>{
+            queryComments()
+            is_judging.value.delete(row.commentId)
+            ElMessage.success("数据可能更新成功")
+        }, 5000)
+    })
+}
 
 function handleDelete(idList: string[]) {
     ElMessageBox.confirm(`真的要删除吗`,'提示', {
@@ -135,7 +150,12 @@ onMounted(()=>{
                     <el-table-column :align="'center'" prop="user.nickname" fixed label="nickname"/>
                     <el-table-column align="center" prop="user.email" fixed label="email"/>
                     <el-table-column align="center" fixed label="emailStatus">
-                        <el-tag type="danger">状态异常，点击后rejudge</el-tag>
+                        <template #default="scope">
+                            <el-tag type="warning" v-if="is_judging.has(scope.row.commentId)">审核中</el-tag>
+                            <el-tag type="success" v-else-if="scope.row.user.emailStatus === 0">已验证</el-tag>
+                            <el-tag type="warning" v-else-if="scope.row.user.emailStatus === 1" style="cursor: pointer" @click="rejudge(scope.row)">未验证</el-tag>
+                            <el-tag type="danger" v-else style="cursor: pointer" @click="rejudge(scope.row)">邮箱状态异常，点击后rejudge</el-tag>
+                        </template>
                     </el-table-column>
                     <el-table-column align="center" prop="articleTitle" fixed label="title"/>
                     <el-table-column align="center" fixed label="content" style="max-height: 100px; display: flex; overflow: clip">
@@ -166,7 +186,7 @@ onMounted(()=>{
 
                     <el-table-column align="center" label="operate">
                         <template #default="scope">
-                            <el-button type="text" @click="handleAccept([scope.$index])">accept</el-button>
+                            <el-button type="text" @click="handleAccept([scope.row.commentId])">accept</el-button>
                             <el-button type="text" @click="handleDelete([scope.row.commentId])"> pass </el-button>
                         </template>
                     </el-table-column>

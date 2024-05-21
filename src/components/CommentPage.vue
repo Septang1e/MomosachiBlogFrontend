@@ -21,6 +21,7 @@ const rootComments : CommentDTO[] = reactive([])
 const props = defineProps({
     articlePid : String
 })
+defineEmits(["refreshRelationList"])
 function paginationCurrentChange(current : number){
     base_page_conf.current = current
     rootCommentDataInit()
@@ -32,12 +33,10 @@ watch(appStore.getCommentRootKey, ()=>{
 
 //用于初始化
 function rootCommentDataInit(){
-     console.log(articleId)
      commentPagination(base_page_conf.size, base_page_conf.current, articlePid.value, "-1",order.value).then((res)=>{
          const data = res.data
          base_page_conf.total = data.total
          appStore.setCurrentPage(`${articlePid}-${base_page_conf.current}`)
-         rootComments.length = 0
          for(let i in data.records){
              const base_info:CommentDTO = data.records[i]
 
@@ -49,6 +48,7 @@ function rootCommentDataInit(){
              rootComments.push(base_info)
              articleId.value = base_info.articlePid
          }
+         loading.value = false
      })
 }
 const articleId = ref("")
@@ -66,11 +66,45 @@ function likeComment(item : CommentDTO){
 }
 const articlePid = ref("")
 onMounted(()=>{
+    console.log(`comment-page is ${props}`, props)
     articlePid.value = <string>props['articlePid']
     appStore.commentCntInit(<string>props['articlePid'])
     rootCommentDataInit()
     appStore.changeReplyToCommentId("root")
+    addEventListener('scroll', handleScroll)
 })
+
+const loading = ref(false)
+function handleScroll() {
+    const ele = document.querySelector('#app')
+    if(ele) {
+
+        if(window.scrollY + window.innerHeight >= ele.scrollHeight - 5 && base_page_conf.total > rootComments.length && !loading.value) {
+            base_page_conf.current += 1
+            loading.value = true
+            setTimeout(()=>{
+                rootCommentDataInit()
+            }, 150)
+        }
+    }
+}
+
+/**
+ *
+ *         <el-pagination
+ *             layout="total, prev, pager, next,jumper"
+ *             v-model:current-page="base_page_conf.current"
+ *             v-model:page-size="base_page_conf.size"
+ *             v-if="base_page_conf.total > 5"
+ *             @currentChange="paginationCurrentChange"
+ *             style="display: flex;align-items: center;justify-content: center;"
+ *             :total="base_page_conf.total"
+ *             class="pagination"
+ *             :background="true"
+ *         />
+ *
+ */
+
 </script>
 
 <template>
@@ -122,32 +156,34 @@ onMounted(()=>{
                     </div>
                     <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                         <comment-submit-card
-                            :to_id="item.commentId"
-                            :root-id=item.commentId
-                            :article-pid="articlePid"
+                            :toId="item.commentId"
+                            :rootId= item.commentId
+                            :articlePid="articlePid"
                         />
                     </div>
                     <div class="reply-box">
                         <reply-card
-                            :article_pid="props['articlePid']"
-                            :root_id="item.commentId"
+                            :articlePid="<string>props['articlePid']"
+                            :rootId="item.commentId"
                         />
                     </div>
                 </div>
                 <el-divider style="margin-top: 10px;opacity: 50%"/>
             </div>
         </div>
-        <el-pagination
-            layout="total, prev, pager, next,jumper"
-            v-model:current-page="base_page_conf.current"
-            v-model:page-size="base_page_conf.size"
-            v-if="base_page_conf.total > 5"
-            @currentChange="paginationCurrentChange"
-            style="display: flex;align-items: center;justify-content: center;"
-            :total="base_page_conf.total"
-            class="pagination"
-            :background="true"
-        />
+            <div
+                v-if="loading"
+                style="display: flex;align-items: center;justify-content: center;font-weight: bold;font-size: 12px;color: darkgrey"
+            >
+                正在加载
+            </div>
+            <div
+                v-if="rootComments.length === base_page_conf.total"
+                style="display: flex;align-items: center;justify-content: center;font-weight: bold;font-size: 12px;color: darkgrey"
+            >
+                没有更多内容了
+            </div>
+
     </div>
     </div>
 </template>

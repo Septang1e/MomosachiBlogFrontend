@@ -5,6 +5,7 @@ import type {UploadCommentInterface} from "@/api/comment";
 import {ElMessage} from "element-plus";
 import getRandomInt from "@/utils/calculation";
 import {useAppStore} from "@/stores/app";
+import {useRoute} from "vue-router";
     const commentData = reactive({
         nickname : '',
         email : '',
@@ -14,12 +15,16 @@ import {useAppStore} from "@/stores/app";
     })
 
 const appStore = useAppStore()
-
+defineEmits(["refreshRelationList"])
 const props = defineProps({
-    article_pid : String,
-    to_id : String,
-    root_id : String
+    articlePid : String,
+    toId : String,
+    rootId : String
 })
+onMounted(()=>{
+    console.log(`submit-card is`, props)
+})
+
 function validateEmail(email: string): boolean {
     const pattern: RegExp = /(^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$)/
     return !pattern.test(email)
@@ -52,23 +57,19 @@ function validateEmail(email: string): boolean {
             content : commentData.content,
             website : commentData.website,
             ipAddress : useAppStore().getIpAddressLocation(),
-            articlePid : <string>props['article_pid'],
+            articlePid : <string>props['articlePid'],
             avatar : commentData.avatar,
-            toId : <string>props["to_id"],
-            rootId : <string>props["root_id"],
+            toId : <string>props["toId"],
+            rootId : <string>props["rootId"],
             avatarRandom : `src/assets/avatar/momosachi_blog_basic_avatar_${getRandomInt(1, 2)}.png`
         })
         console.log(commentDTO)
         addComment(commentDTO).then((res)=>{
-            if(res.code == 1) {
-                ElMessage.success("发送成功")
-                if(commentDTO.rootId === '-1' && commentDTO.toId === '-1') {
-                    appStore.rootCommentUpdateHandler()
-                }else{
-                    appStore.childCommentUpdateHandler()
-                }
+            ElMessage.success(<string>res.data)
+            if(commentDTO.rootId === '-1' && commentDTO.toId === '-1') {
+                appStore.rootCommentUpdateHandler()
             }else{
-                ElMessage.error("发送失败")
+                appStore.childCommentUpdateHandler()
             }
         })
     }

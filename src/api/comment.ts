@@ -18,13 +18,13 @@ export interface UploadCommentInterface{
 }
 
 export interface CommentDTO{
-    toId : string,
+    toId : string
     rootId : string,
-    articlePid : string,
+    articlePid : string
     commentId : string
     toName: string
-    content : string,
-    nickname : string,
+    content : string
+    nickname : string
     feature : string
     email : string,
     website : string,
@@ -41,7 +41,7 @@ export interface CommentDTO{
 
 
 export interface CommentQueryDTO{
-    userQueryDTO: UserQueryDTO
+    user: UserQueryDTO
     commentId: string
     articleTitle: string
     content: string
@@ -52,6 +52,7 @@ export type CommentPage = Page<CommentDTO>
 export type CommentExaminePage = Page<CommentQueryDTO>
 
 export function addComment(comment : UploadCommentInterface){
+
     return request<{code : number,data : string}>({
         url : '/api/comment/',
         data : comment,

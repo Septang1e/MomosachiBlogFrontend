@@ -19,10 +19,10 @@ const page_conf = reactive({
 const appStore = useAppStore()
 
 const props = defineProps({
-    article_pid : String,
-    root_id : String,
+    articlePid : String,
+    rootId : String,
 })
-
+defineEmits(["refreshRelationList"])
 function paginationCurrentChange(current : number){
     page_conf.current = current
     rootCommentDataInit()
@@ -43,6 +43,7 @@ function likeComment(item : CommentDTO){
 
 onMounted(()=>{
     rootCommentDataInit()
+    console.log(`reply-card is `, props)
 })
 watch(appStore.getCurrentPage, ()=>{
     page_conf.expand = false
@@ -55,7 +56,7 @@ watch(appStore.getCommentChildKey, ()=>{
 
 
 function rootCommentDataInit(){
-    commentPagination(page_conf.size, page_conf.current, <string>props['article_pid'], <string>props['root_id'], "create-time").then((res)=>{
+    commentPagination(page_conf.size, page_conf.current, <string>props['articlePid'], <string>props['rootId'], "create-time").then((res)=>{
         const data = res.data
         replyComments.length = 0
         page_conf.total = data.total
@@ -116,9 +117,9 @@ function rootCommentDataInit(){
             </div>
             <div class="reply-submit-box" v-if="appStore.replyToCommentId === item.commentId">
                 <comment-submit-card
-                    :root-id="props['root_id']"
-                    :to_id="item.commentId"
-                    :article-pid="item.articlePid"
+                    :rootId="props['rootId']"
+                    :toId="item.commentId"
+                    :articlePid="item.articlePid"
                 />
             </div>
         </div>
